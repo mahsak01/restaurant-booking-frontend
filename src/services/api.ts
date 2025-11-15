@@ -138,7 +138,7 @@ export const getUsers = async (): Promise<User[]> => {
     throw new Error('Authentication token is required');
   }
 
-  const response = await fetch(`${API_BASE_URL}/auth/admin/users`, {
+  const response = await fetch(`${API_BASE_URL}/admin/users`, {
     method: 'GET',
     headers: getAuthHeaders(),
   });
@@ -158,7 +158,7 @@ export interface DeleteUserResponse {
 }
 
 export const deleteUser = async (id: number): Promise<DeleteUserResponse> => {
-  const response = await fetch(`${API_BASE_URL}/auth/admin/users/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/admin/users/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
