@@ -18,7 +18,7 @@ const Users: React.FC = () => {
     phone: '',
     password: '',
     name: '',
-    role: 'user',
+    role: 'customer',
   });
 
   useEffect(() => {
@@ -61,7 +61,7 @@ const Users: React.FC = () => {
         phone: '',
         password: '',
         name: '',
-        role: 'user',
+        role: 'customer',
       });
       // Refresh users list
       fetchUsers();
@@ -86,7 +86,7 @@ const Users: React.FC = () => {
       phone: '',
       password: '',
       name: '',
-      role: 'user',
+      role: 'customer',
     });
     setAddUserError('');
   };
@@ -179,7 +179,7 @@ const Users: React.FC = () => {
                     <td>{user.phone}</td>
                     <td>
                       <span className={`role-badge role-${user.role}`}>
-                        {user.role === 'admin' ? 'مدیر' : user.role === 'user' ? 'کاربر' : user.role}
+                        {user.role === 'admin' ? 'مدیر' : user.role === 'customer' ? 'کاربر' : user.role}
                       </span>
                     </td>
                     <td>{formatDate(user.created_at)}</td>
@@ -263,7 +263,7 @@ const Users: React.FC = () => {
                   onChange={handleInputChange}
                   required
                 >
-                  <option value="user">کاربر</option>
+                  <option value="customer">کاربر</option>
                   <option value="admin">مدیر</option>
                 </select>
               </div>
