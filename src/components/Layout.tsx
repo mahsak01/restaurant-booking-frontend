@@ -3,8 +3,18 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { removeToken } from '../utils/auth';
 import './Layout.css';
 
+interface MenuItem {
+  path?: string;
+  label: string;
+  icon: string;
+  children?: MenuItem[];
+}
+
 const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [expandedMenus, setExpandedMenus] = useState<{ [key: string]: boolean }>({
+    menu: true,
+  });
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -13,13 +23,45 @@ const Layout: React.FC = () => {
     navigate('/login');
   };
 
-  const menuItems = [
+  const menuItems: MenuItem[] = [
     { path: '/', label: 'داشبورد', icon: '📊' },
     { path: '/users', label: 'کاربران', icon: '👥' },
+    {
+      label: 'منو',
+      icon: '🍽️',
+      children: [
+        { path: '/menus', label: 'لیست منوها', icon: '📋' },
+        { path: '/categories', label: 'دسته‌بندی‌ها', icon: '📁' },
+      ],
+    },
   ];
 
-  const isActive = (path: string) => {
+  const isActive = (path?: string) => {
+    if (!path) return false;
     return location.pathname === path;
+  };
+
+  const isParentActive = (item: MenuItem): boolean => {
+    if (item.path && isActive(item.path)) return true;
+    if (item.children) {
+      return item.children.some(child => isActive(child.path));
+    }
+    return false;
+  };
+
+  const toggleMenu = (label: string) => {
+    setExpandedMenus(prev => ({
+      ...prev,
+      [label]: !prev[label],
+    }));
+  };
+
+  const handleMenuClick = (item: MenuItem) => {
+    if (item.children) {
+      toggleMenu(item.label);
+    } else if (item.path) {
+      navigate(item.path);
+    }
   };
 
   return (
@@ -36,15 +78,39 @@ const Layout: React.FC = () => {
         </div>
         
         <nav className="sidebar-nav">
-          {menuItems.map((item) => (
-            <button
-              key={item.path}
-              className={`nav-item ${isActive(item.path) ? 'active' : ''}`}
-              onClick={() => navigate(item.path)}
-            >
-              <span className="nav-icon">{item.icon}</span>
-              {sidebarOpen && <span className="nav-label">{item.label}</span>}
-            </button>
+          {menuItems.map((item, index) => (
+            <div key={item.path || item.label || index} className="nav-item-wrapper">
+              <button
+                className={`nav-item ${item.children ? 'has-children' : ''} ${isParentActive(item) ? 'active' : ''}`}
+                onClick={() => handleMenuClick(item)}
+              >
+                <span className="nav-icon">{item.icon}</span>
+                {sidebarOpen && (
+                  <>
+                    <span className="nav-label">{item.label}</span>
+                    {item.children && (
+                      <span className={`nav-arrow ${expandedMenus[item.label] ? 'expanded' : ''}`}>
+                        ▼
+                      </span>
+                    )}
+                  </>
+                )}
+              </button>
+              {item.children && sidebarOpen && expandedMenus[item.label] && (
+                <div className="submenu">
+                  {item.children.map((child) => (
+                    <button
+                      key={child.path}
+                      className={`submenu-item ${isActive(child.path) ? 'active' : ''}`}
+                      onClick={() => child.path && navigate(child.path)}
+                    >
+                      <span className="submenu-icon">{child.icon}</span>
+                      <span className="submenu-label">{child.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
         </nav>
 

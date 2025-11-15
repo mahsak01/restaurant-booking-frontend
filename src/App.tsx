@@ -5,6 +5,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import Users from './components/Users';
+import Menus from './components/Menus';
+import Categories from './components/Categories';
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
         >
           <Route index element={<Dashboard />} />
           <Route path="users" element={<Users />} />
+          <Route path="menus" element={<Menus />} />
+          <Route path="categories" element={<Categories />} />
         </Route>
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

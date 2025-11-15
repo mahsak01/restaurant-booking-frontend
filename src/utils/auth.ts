@@ -10,9 +10,22 @@ export const setToken = (token: string): void => {
 
 export const removeToken = (): void => {
   localStorage.removeItem('token');
+  localStorage.removeItem('userRole');
 };
 
 export const isAuthenticated = (): boolean => {
   return !!getToken();
+};
+
+export const getUserRole = (): string | null => {
+  return localStorage.getItem('userRole');
+};
+
+export const setUserRole = (role: string): void => {
+  localStorage.setItem('userRole', role);
+};
+
+export const isAdmin = (): boolean => {
+  return getUserRole() === 'admin';
 };
 

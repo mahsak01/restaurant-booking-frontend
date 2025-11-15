@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { login } from '../services/api';
-import { setToken, isAuthenticated } from '../utils/auth';
+import { setToken, setUserRole, isAuthenticated, isAdmin } from '../utils/auth';
 import './Login.css';
 
 const Login: React.FC = () => {
@@ -10,12 +10,19 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    if (isAuthenticated()) {
+    if (isAuthenticated() && isAdmin()) {
       navigate('/');
     }
-  }, [navigate]);
+    
+    // Check if there's an error message from redirect
+    const errorMsg = searchParams.get('error');
+    if (errorMsg) {
+      setError(errorMsg);
+    }
+  }, [navigate, searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,13 +32,21 @@ const Login: React.FC = () => {
     try {
       const response = await login({ phone, password });
       
-      // Save token to localStorage
+      // Check if user is admin
+      if (response.data.user.role !== 'admin') {
+        setError('شما دسترسی به این بخش را ندارید. فقط مدیران می‌توانند وارد شوند.');
+        setLoading(false);
+        return;
+      }
+      
+      // Save token and user role to localStorage
       setToken(response.data.token);
+      setUserRole(response.data.user.role);
       
       // Redirect to home or dashboard
       navigate('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+      setError(err instanceof Error ? err.message : 'ورود ناموفق بود');
     } finally {
       setLoading(false);
     }
