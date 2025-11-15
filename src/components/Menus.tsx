@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getMenus, createMenu, updateMenu, deleteMenu, getCategories, Menu, Category, CreateMenuRequest } from '../services/api';
+import { getMenus, createMenu, updateMenu, deleteMenu, getCategoriesOptions, Menu, CategoryOption, CreateMenuRequest } from '../services/api';
 import './Menus.css';
 
 const Menus: React.FC = () => {
   const [menus, setMenus] = useState<Menu[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -49,7 +49,7 @@ const Menus: React.FC = () => {
 
   const fetchCategories = async () => {
     try {
-      const data = await getCategories();
+      const data = await getCategoriesOptions();
       setCategories(data);
     } catch (err) {
       console.error('Error fetching categories:', err);
@@ -220,7 +220,6 @@ const Menus: React.FC = () => {
                 <th>توضیحات</th>
                 <th>دسته‌بندی</th>
                 <th>قیمت</th>
-                <th>وضعیت</th>
                 <th>تاریخ ایجاد</th>
                 <th>تاریخ بروزرسانی</th>
                 <th>عملیات</th>
@@ -241,11 +240,7 @@ const Menus: React.FC = () => {
                     <td>{menu.description || '-'}</td>
                     <td>{menu.category || '-'}</td>
                     <td>{formatPrice(menu.price)}</td>
-                    <td>
-                      <span className={`status-badge ${menu.available ? 'available' : 'unavailable'}`}>
-                        {menu.available ? 'موجود' : 'ناموجود'}
-                      </span>
-                    </td>
+                  
                     <td>{formatDate(menu.created_at)}</td>
                     <td>{formatDate(menu.updated_at)}</td>
                     <td>
@@ -337,9 +332,9 @@ const Menus: React.FC = () => {
                   required
                 >
                   <option value="">انتخاب دسته‌بندی</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.name}>
-                      {category.name}
+                  {categories.map((category, index) => (
+                    <option key={index} value={category.value}>
+                      {category.label}
                     </option>
                   ))}
                 </select>
@@ -432,9 +427,9 @@ const Menus: React.FC = () => {
                   required
                 >
                   <option value="">انتخاب دسته‌بندی</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.name}>
-                      {category.name}
+                  {categories.map((category, index) => (
+                    <option key={index} value={category.value}>
+                      {category.label}
                     </option>
                   ))}
                 </select>

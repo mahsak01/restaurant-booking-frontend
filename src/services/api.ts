@@ -133,6 +133,11 @@ export const login = async (credentials: LoginRequest): Promise<LoginResponse> =
 };
 
 export const getUsers = async (): Promise<User[]> => {
+  const token = getToken();
+  if (!token) {
+    throw new Error('Authentication token is required');
+  }
+
   const response = await fetch(`${API_BASE_URL}/auth/admin/users`, {
     method: 'GET',
     headers: getAuthHeaders(),
