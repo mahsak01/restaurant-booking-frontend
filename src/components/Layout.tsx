@@ -14,6 +14,7 @@ const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [expandedMenus, setExpandedMenus] = useState<{ [key: string]: boolean }>({
     menu: true,
+    'میزها': true,
   });
   const navigate = useNavigate();
   const location = useLocation();
@@ -34,7 +35,15 @@ const Layout: React.FC = () => {
         { path: '/categories', label: 'دسته‌بندی‌ها', icon: '📁' },
       ],
     },
-    { path: '/tables', label: 'میزها', icon: '🪑' },
+    {
+      label: 'میزها',
+      icon: '🪑',
+      children: [
+        { path: '/tables', label: 'لیست میزها', icon: '🪑' },
+        { path: '/reservations', label: 'رزرو میز', icon: '📅' },
+      ],
+    },
+    { path: '/orders', label: 'سفارش‌ها', icon: '🛒' },
   ];
 
   const isActive = (path?: string) => {

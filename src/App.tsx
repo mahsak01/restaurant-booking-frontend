@@ -8,6 +8,8 @@ import Users from './components/Users';
 import Menus from './components/Menus';
 import Categories from './components/Categories';
 import Tables from './components/Tables';
+import Reservations from './components/Reservations';
+import Orders from './components/Orders';
 
 function App() {
   return (
@@ -27,6 +29,8 @@ function App() {
           <Route path="menus" element={<Menus />} />
           <Route path="categories" element={<Categories />} />
           <Route path="tables" element={<Tables />} />
+          <Route path="reservations" element={<Reservations />} />
+          <Route path="orders" element={<Orders />} />
         </Route>
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

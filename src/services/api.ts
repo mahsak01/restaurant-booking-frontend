@@ -77,8 +77,9 @@ export interface Category {
   updated_at: string;
   deleted_at: string | null;
   name: string;
+  display_name: string;
   description?: string;
-  image_url?: string;
+  sort_order?: number;
 }
 
 export interface CategoriesResponse {
@@ -241,6 +242,83 @@ export const getCategoriesOptions = async (): Promise<CategoryOption[]> => {
   }
 
   return data.data || [];
+};
+
+export interface CreateCategoryRequest {
+  name: string;
+  display_name: string;
+  description?: string;
+  sort_order?: number;
+}
+
+export interface CreateCategoryResponse {
+  data: {
+    category: Category;
+  };
+  message: string;
+  success: boolean;
+}
+
+export const createCategory = async (categoryData: CreateCategoryRequest): Promise<CreateCategoryResponse> => {
+  const response = await fetch(`${API_BASE_URL}/admin/categories`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(categoryData),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || 'Failed to create category');
+  }
+
+  return data;
+};
+
+export interface UpdateCategoryRequest extends CreateCategoryRequest {}
+
+export interface UpdateCategoryResponse {
+  data: {
+    category: Category;
+  };
+  message: string;
+  success: boolean;
+}
+
+export const updateCategory = async (id: number, categoryData: UpdateCategoryRequest): Promise<UpdateCategoryResponse> => {
+  const response = await fetch(`${API_BASE_URL}/admin/categories/${id}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(categoryData),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || 'Failed to update category');
+  }
+
+  return data;
+};
+
+export interface DeleteCategoryResponse {
+  message: string;
+  success: boolean;
+}
+
+export const deleteCategory = async (id: number): Promise<DeleteCategoryResponse> => {
+  const response = await fetch(`${API_BASE_URL}/admin/categories/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || 'Failed to delete category');
+  }
+
+  return data;
 };
 
 export interface CreateMenuRequest {
@@ -467,11 +545,9 @@ export interface Reservation {
   deleted_at: string | null;
   user_id: number;
   table_id: number;
-  reservation_date: string;
-  reservation_time: string;
-  number_of_guests: number;
+  date: string;
+  time: string;
   status: string;
-  special_requests?: string;
   user?: User;
   table?: Table;
 }
@@ -602,6 +678,177 @@ export const cancelReservation = async (id: number): Promise<CancelReservationRe
 
   if (!response.ok || !data.success) {
     throw new Error(data.message || 'Failed to cancel reservation');
+  }
+
+  return data;
+};
+
+export interface OrderItem {
+  id: number;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+  order_id: number;
+  menu_item_id: number;
+  quantity: number;
+  price: number;
+  notes?: string;
+  menu_item?: Menu;
+}
+
+export interface Order {
+  id: number;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+  user_id: number;
+  status: string;
+  total_price: number;
+  user?: User;
+  order_items?: OrderItem[];
+}
+
+export interface OrdersResponse {
+  data: Order[];
+  message: string;
+  success: boolean;
+}
+
+export interface OrderResponse {
+  data: Order;
+  message: string;
+  success: boolean;
+}
+
+export interface OrderStatus {
+  value: string;
+  label: string;
+}
+
+export interface OrderStatusesResponse {
+  data: OrderStatus[];
+  message: string;
+  success: boolean;
+}
+
+export const getOrders = async (): Promise<Order[]> => {
+  const token = getToken();
+  if (!token) {
+    throw new Error('Authentication token is required');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/admin/orders`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+
+  const data: OrdersResponse = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || 'Failed to fetch orders');
+  }
+
+  return data.data || [];
+};
+
+export const getOrderById = async (id: number): Promise<Order> => {
+  const token = getToken();
+  if (!token) {
+    throw new Error('Authentication token is required');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/admin/orders/${id}`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+
+  const data: OrderResponse = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || 'Failed to fetch order');
+  }
+
+  return data.data;
+};
+
+export const getOrderStatuses = async (): Promise<OrderStatus[]> => {
+  const token = getToken();
+  if (!token) {
+    throw new Error('Authentication token is required');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/admin/orders/statuses`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+
+  const data: OrderStatusesResponse = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || 'Failed to fetch order statuses');
+  }
+
+  return data.data || [];
+};
+
+export interface CreateOrderItemRequest {
+  menu_item_id: number;
+  quantity: number;
+  notes?: string;
+}
+
+export interface CreateOrderRequest {
+  user_id: number;
+  order_items: CreateOrderItemRequest[];
+}
+
+export interface CreateOrderResponse {
+  data: {
+    order: Order;
+  };
+  message: string;
+  success: boolean;
+}
+
+export const createOrder = async (orderData: CreateOrderRequest): Promise<CreateOrderResponse> => {
+  const response = await fetch(`${API_BASE_URL}/admin/orders`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(orderData),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || 'Failed to create order');
+  }
+
+  return data;
+};
+
+export interface UpdateOrderStatusRequest {
+  status: string;
+}
+
+export interface UpdateOrderStatusResponse {
+  data: {
+    order: Order;
+  };
+  message: string;
+  success: boolean;
+}
+
+export const updateOrderStatus = async (id: number, status: string): Promise<UpdateOrderStatusResponse> => {
+  const response = await fetch(`${API_BASE_URL}/admin/orders/${id}/status`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ status }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || 'Failed to update order status');
   }
 
   return data;
