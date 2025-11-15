@@ -320,3 +320,290 @@ export const deleteMenu = async (id: number): Promise<DeleteMenuResponse> => {
   return data;
 };
 
+export interface Table {
+  id: number;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+  number: number;
+  capacity: number;
+  status: string;
+  location: string;
+}
+
+export interface TablesResponse {
+  data: Table[];
+  message: string;
+  success: boolean;
+}
+
+export interface TableResponse {
+  data: Table;
+  message: string;
+  success: boolean;
+}
+
+export const getTables = async (): Promise<Table[]> => {
+  const token = getToken();
+  if (!token) {
+    throw new Error('Authentication token is required');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/admin/tables`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+
+  const data: TablesResponse = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || 'Failed to fetch tables');
+  }
+
+  return data.data || [];
+};
+
+export const getTableById = async (id: number): Promise<Table> => {
+  const token = getToken();
+  if (!token) {
+    throw new Error('Authentication token is required');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/admin/tables/${id}`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+
+  const data: TableResponse = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || 'Failed to fetch table');
+  }
+
+  return data.data;
+};
+
+export interface CreateTableRequest {
+  number: number;
+  capacity: number;
+  status: string;
+  location: string;
+}
+
+export interface CreateTableResponse {
+  data: {
+    table: Table;
+  };
+  message: string;
+  success: boolean;
+}
+
+export const createTable = async (tableData: CreateTableRequest): Promise<CreateTableResponse> => {
+  const response = await fetch(`${API_BASE_URL}/admin/tables`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(tableData),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || 'Failed to create table');
+  }
+
+  return data;
+};
+
+export interface UpdateTableRequest extends CreateTableRequest {}
+
+export interface UpdateTableResponse {
+  data: {
+    table: Table;
+  };
+  message: string;
+  success: boolean;
+}
+
+export const updateTable = async (id: number, tableData: UpdateTableRequest): Promise<UpdateTableResponse> => {
+  const response = await fetch(`${API_BASE_URL}/admin/tables/${id}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(tableData),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || 'Failed to update table');
+  }
+
+  return data;
+};
+
+export interface DeleteTableResponse {
+  message: string;
+  success: boolean;
+}
+
+export const deleteTable = async (id: number): Promise<DeleteTableResponse> => {
+  const response = await fetch(`${API_BASE_URL}/admin/tables/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || 'Failed to delete table');
+  }
+
+  return data;
+};
+
+export interface Reservation {
+  id: number;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+  user_id: number;
+  table_id: number;
+  reservation_date: string;
+  reservation_time: string;
+  number_of_guests: number;
+  status: string;
+  special_requests?: string;
+  user?: User;
+  table?: Table;
+}
+
+export interface ReservationsResponse {
+  data: Reservation[];
+  message: string;
+  success: boolean;
+}
+
+export interface ReservationResponse {
+  data: Reservation;
+  message: string;
+  success: boolean;
+}
+
+export interface ReservationStatus {
+  value: string;
+  label: string;
+}
+
+export interface ReservationStatusesResponse {
+  data: ReservationStatus[];
+  message: string;
+  success: boolean;
+}
+
+export const getReservations = async (): Promise<Reservation[]> => {
+  const token = getToken();
+  if (!token) {
+    throw new Error('Authentication token is required');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/admin/reservations`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+
+  const data: ReservationsResponse = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || 'Failed to fetch reservations');
+  }
+
+  return data.data || [];
+};
+
+export const getReservationById = async (id: number): Promise<Reservation> => {
+  const token = getToken();
+  if (!token) {
+    throw new Error('Authentication token is required');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/admin/reservations/${id}`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+
+  const data: ReservationResponse = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || 'Failed to fetch reservation');
+  }
+
+  return data.data;
+};
+
+export const getReservationStatuses = async (): Promise<ReservationStatus[]> => {
+  const token = getToken();
+  if (!token) {
+    throw new Error('Authentication token is required');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/admin/reservations/statuses`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+
+  const data: ReservationStatusesResponse = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || 'Failed to fetch reservation statuses');
+  }
+
+  return data.data || [];
+};
+
+export interface UpdateReservationStatusRequest {
+  status: string;
+}
+
+export interface UpdateReservationStatusResponse {
+  data: {
+    reservation: Reservation;
+  };
+  message: string;
+  success: boolean;
+}
+
+export const updateReservationStatus = async (id: number, status: string): Promise<UpdateReservationStatusResponse> => {
+  const response = await fetch(`${API_BASE_URL}/admin/reservations/${id}/status`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ status }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || 'Failed to update reservation status');
+  }
+
+  return data;
+};
+
+export interface CancelReservationResponse {
+  message: string;
+  success: boolean;
+}
+
+export const cancelReservation = async (id: number): Promise<CancelReservationResponse> => {
+  const response = await fetch(`${API_BASE_URL}/admin/reservations/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || 'Failed to cancel reservation');
+  }
+
+  return data;
+};
+

@@ -34,6 +34,7 @@ const Layout: React.FC = () => {
         { path: '/categories', label: 'دسته‌بندی‌ها', icon: '📁' },
       ],
     },
+    { path: '/tables', label: 'میزها', icon: '🪑' },
   ];
 
   const isActive = (path?: string) => {

@@ -7,6 +7,7 @@ import Dashboard from './components/Dashboard';
 import Users from './components/Users';
 import Menus from './components/Menus';
 import Categories from './components/Categories';
+import Tables from './components/Tables';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="users" element={<Users />} />
           <Route path="menus" element={<Menus />} />
           <Route path="categories" element={<Categories />} />
+          <Route path="tables" element={<Tables />} />
         </Route>
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
